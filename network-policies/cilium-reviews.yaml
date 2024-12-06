@@ -1,0 +1,31 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: reviews-policy
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: reviews
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: productpage
+      toPorts:
+        - ports:
+            - port: "9080"
+              protocol: TCP
+          rules:
+            http:
+            - method: "GET"
+              path: "/details" 
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: ratings
+      toPorts:
+        - ports:
+            - port: "9080"
+              protocol: TCP

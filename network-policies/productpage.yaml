@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: productpage-policy
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: productpage
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - ipBlock:
+        cidr: 0.0.0.0/0
+    ports:
+    - protocol: TCP
+      port: 9080
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: reviews
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: details
