@@ -71,10 +71,11 @@ kubectl expose pod productpage --port 9080 --target-port 9080
 kubectl expose pod reviews --port 9080 --target-port 9080
 kubectl expose pod details --port 9080 --target-port 9080
 kubectl get services
+kubectl get services productpage
 ```
 
-http://10.99.151.9:9080/productpage doesn't work, clusterip
-internal only, IP handled only within Kubernetes
+`curl http://10.99.151.9:9080/productpage` works, clusterip
+internal only, since we are hosting the cluster on the same box
 NodePort maps a high port 30000–32768 from the cluster itself to a service
 
 ```shell
@@ -84,6 +85,15 @@ kubectl get services
 ```
 
 http://localhost:32746/productpage
+
+ClusterIp exposure < NodePort exposure < LoadBalancer exposure
+
+ClusterIp
+Expose service through k8s cluster with ip/name:port
+NodePort
+Expose service through Internal network VM's also external to k8s ip/name:port
+Ingress
+Expose service through External world.
 
 ```shell
 kubectl delete service details productpage reviews
@@ -165,9 +175,10 @@ Repeat:
 ```shell 
 kubectl apply -f reviews.yaml
 ```
- fails
 
-Edit to pare down to 
+warning
+
+Edit to pare down to
 
 ```yaml
 apiVersion: apps/v1
@@ -202,11 +213,142 @@ spec:
 
 Repeat:
 
-```shell 
+```shell
 kubectl apply -f reviews.yaml
 ```
 
-works
+works cleaner
+
+```shell
+kubectl explain deployments
+kubectl explain deployments --recursive
+kubectl explain deployments.spec.template.spec.containers
+```
+
+Create `ingress.yaml`
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bookinfo-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: productpage
+            port:
+              number: 9080
+```
+
+```shell
+kubectl apply -f ingress.yaml
+kubectl get ingress
+kubectl describe ingress bookinfo-ingress
+```
+
+`traefik` is deployed with k3s. An ingress maps to a service.
+
+`curl https://172.31.14.81/`
+
+works even from your neighbor's environment. Not from your laptop since k3s only
+knows about the private IP address. But if you had a public IP address (you do),
+and the firewalls were open (they are), you could use the public IP.
+
+AWS Sidebar:
+
+`curl http://checkip.amazonaws.com` or `curl icanhazip.com`
+
+Right way, use the AWS Instance Metadata Service:
+
+```shell
+TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
+curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/
+curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4
+```
+
+Visit `http://3.147.27.216/` from your local browser.
+
+Because Kubernetes is a well-defined interface, people can write other code that
+works with that framework and API and adds significant capability, without
+having to know which implementation of Kubernetes you are using (usually).
+
+```shell
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.16.2/cert-manager.yaml
+kubectl get services
+kubectl get namespaces
+kubectl get pods --namespace cert-manager
+```
+
+Let's Encrypt aka ACME
+
+`cluster-issuer.yaml`
+
+```yaml
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-cert
+spec:
+  acme:
+    email: letsencrypt@otherdevopsgene.dev #Replace with your email
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-cert-private-key
+    solvers:
+      - http01:
+          ingress:
+            class: traefik
+```
+
+```shell
+kubectl apply -f cluster-issuer.yaml
+kubectl get secrets -n cert-manager
+kubectl describe secret -n cert-manager letsencrypt-cert-private-key
+```
+
+Not actually secret
+
+```shell
+kubectl get secret -n cert-manager letsencrypt-cert-private-key --template="{{index .data \"tls.key\"}}" | base64 -d
+kubectl get secret -n cert-manager letsencrypt-cert-private-key -o json | jq '.data | map_values(@base64d)'
+```
+
+JSON, YAML, [Go Templates](https://pkg.go.dev/text/template), JSON Path
+
+Could have used `--template={{.data.tls.key}}` except `tls.key` has a dot.
+
+
+Update `ingress.yaml`
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bookinfo-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-cert # name from cluster-issuer
+spec:
+  rules:
+  - host: tom.codemash.otherdevopsgene.dev # replace tom with your username
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: productpage
+            port:
+              number: 9080
+  tls:
+  - hosts:
+    - tom.codemash.otherdevopsgene.dev # replace tom with your username
+    secretName: acme-tls-cert
+```
 
 Template `v1` to `v2` in two places
 
