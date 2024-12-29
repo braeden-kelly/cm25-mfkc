@@ -47,6 +47,11 @@ docker run --rm -d -p 9082:9080 docker.io/istio/examples-bookinfo-details-v1:1.2
 
 http://localhost:9080/productpage
 
+```shell
+docker rm -f $(docker ps -q)
+docker ps
+```
+
 ## deploy bookinfo in k3s by hand
 
 ```shell
@@ -96,6 +101,14 @@ Ingress
 Expose service through External world.
 
 ```shell
+curl http://10.43.179.185:9080/reviews/2
+curl http://reviews.default.svc.cluster.local:9080/reviews/2
+```
+
+port-forwarding
+
+
+```shell
 kubectl delete service details productpage reviews
 kubectl delete pod details productpage reviews
 ```
@@ -113,19 +126,19 @@ kubectl get pods
 ```
 
 ```shell
-kubectl expose deployment productpage --port 9080 --target-port 9080 --type NodePort
+kubectl expose deployment productpage --port 9080 --target-port 9080
 kubectl expose deployment reviews --port 9080 --target-port 9080
 kubectl expose deployment details --port 9080 --target-port 9080
 kubectl get services
 ```
 
-http://localhost:32557/productpage
-
+http://10.43.194.60:9080/productpage
 
 ```shell
 kubectl get pods
 kubectl delete pod productpage-644c575c58-cpxw5
 kubectl get pods
+kubectl get services
 ```
 
 service hasn't changed, URL still works
@@ -138,7 +151,7 @@ kubectl get replicaset
 
 deployment wraps a replicaset wraps pods
 keeps them running
-play around deleting 
+play around deleting
 
 ```shell
 kubectl get deployments
@@ -176,7 +189,7 @@ Repeat:
 kubectl apply -f reviews.yaml
 ```
 
-warning
+error
 
 Edit to pare down to
 
@@ -219,6 +232,14 @@ kubectl apply -f reviews.yaml
 
 works cleaner
 
+Repeat again:
+
+```shell
+kubectl apply -f reviews.yaml
+```
+
+idempotent
+
 ```shell
 kubectl explain deployments
 kubectl explain deployments --recursive
@@ -253,7 +274,7 @@ kubectl describe ingress bookinfo-ingress
 
 `traefik` is deployed with k3s. An ingress maps to a service.
 
-`curl https://172.31.14.81/`
+`curl https://172.31.14.81/productpage`
 
 works even from your neighbor's environment. Not from your laptop since k3s only
 knows about the private IP address. But if you had a public IP address (you do),
@@ -271,7 +292,7 @@ curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-da
 curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4
 ```
 
-Visit `http://3.147.27.216/` from your local browser.
+Visit `http://3.147.27.216/productpage` from your local browser.
 
 Because Kubernetes is a well-defined interface, people can write other code that
 works with that framework and API and adds significant capability, without
@@ -282,6 +303,8 @@ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/
 kubectl get services
 kubectl get namespaces
 kubectl get pods --namespace cert-manager
+kubectl get pods -A
+kubectl logs -n kube-system traefik-57b79cf995-dgc77
 ```
 
 Let's Encrypt aka ACME
@@ -296,7 +319,7 @@ metadata:
 spec:
   acme:
     email: letsencrypt@otherdevopsgene.dev #Replace with your email
-    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    server: https://acme-staging-v02.api.letsencrypt.org/directory # https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: letsencrypt-cert-private-key
     solvers:
@@ -322,6 +345,8 @@ JSON, YAML, [Go Templates](https://pkg.go.dev/text/template), JSON Path
 
 Could have used `--template={{.data.tls.key}}` except `tls.key` has a dot.
 
+`ConfigSet` is the same thing, without pretending to be secret. Just name-value
+pair store.
 
 Update `ingress.yaml`
 
@@ -350,6 +375,83 @@ spec:
     secretName: acme-tls-cert
 ```
 
+```shell
+kubectl apply -f ingress.yaml
+kubectl describe ingress bookinfo-ingress
+```
+
+TLS and CreateCertificate
+
+```shell
+kubectl get secrets
+kubectl describe secrets acme-tls-cert
+kubectl get ingress
+kubectl describe ingress cm-acme-http-solver-bfm2g
+```
+
+Understated value of Kubernetes. Installed cert-manager, pointed it to Let's
+Encrypt. Redeployed our ingress to include a hostname and the cluster-issuer ==
+cert-manager configuration we wanted to use.
+
+We proved that we were entitled to use the domain name
+(cm-acme-http-solver-bfm2g), generated a certificate request, requested a cert
+with the CA, received and installed the certificate, set up the Ingress for TLS
+termination. All that's left is to make `http` redirect to `https`.
+
+`curl --head http://bethtruss.codemash.otherdevopsgene.dev/productpage`
+
+Notice the `200 OK`
+
+This step happens to be Traefik-specific.
+
+`middleware.yaml`
+
+```yaml
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect
+  namespace: default
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
+```
+
+In `ingress.yaml` add an annotation:
+
+```yaml
+    traefik.ingress.kubernetes.io/router.middlewares: default-redirect@kubernetescrd
+```
+
+`namespace`-`middlewarename`@kubernetescrd
+
+```shell
+kubectl apply -f middleware.yaml
+kubectl apply -f ingress.yaml
+```
+
+`curl --head http://bethtruss.codemash.otherdevopsgene.dev/productpage`
+
+Notice the `308 Permanent Redirect`
+
+`curl --head https://bethtruss.codemash.otherdevopsgene.dev/productpage`
+
+Deployment rollout, CrashLoopBackOff
+readiness-liveness
+Volumes
+Namespaces - Multi-tenant
+
+Demo: AWS EKS, autoscaling, Cilium, Hubble, Network Policies
+
 Template `v1` to `v2` in two places
 
+For admins, do [Kubernetes the Hard
+Way](https://github.com/kelseyhightower/kubernetes-the-hard-way). Then never do
+it without a tool again.
+
+For practice,
+
+- [Tutorials](https://kubernetes.io/docs/tutorials/)
+- [KodeKloud Kubernetes Free Labs](https://kodekloud.com/free-labs/kubernetes).
 
