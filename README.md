@@ -455,3 +455,8 @@ For practice,
 - [Tutorials](https://kubernetes.io/docs/tutorials/)
 - [KodeKloud Kubernetes Free Labs](https://kodekloud.com/free-labs/kubernetes).
 
+More learning,
+
+- [LinuxFoundationX: Introduction to
+  Kubernetes](https://www.edx.org/learn/kubernetes/the-linux-foundation-introduction-to-kubernetes)
+- [TechWorld with Nana](https://youtu.be/s_o8dwzRlu4?si=T38bQK3OhwbIEzJ7)
