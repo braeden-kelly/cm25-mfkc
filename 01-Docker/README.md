@@ -81,5 +81,7 @@ docker stop $(docker ps -q)
 docker ps
 ```
 
-We will recreate this with Kubernetes
+## End of lesson
+
+We will recreate this with Kubernetes in the next lesson,
 [02-Basics](../02-Basics/README.md).
