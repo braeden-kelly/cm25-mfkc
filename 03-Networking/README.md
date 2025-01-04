@@ -183,12 +183,12 @@ Craft a statement to pull the reviews and details for book ID 2 (or whatever
 integer, it literally doesn't matter) by passing it as path info on the URL
 (i.e., add `/2` to the end of the URL). The response will be JSON.
 
-[//]: # (curl -sS http://$(kubectl get service reviews -o jsonpath='{.spec.clusterIP}'):$(kubectl get service reviews -o jsonpath='{.spec.ports[0].port}')/reviews/2 | jq)
+<!-- curl -sS http://$(kubectl get service reviews -o jsonpath='{.spec.clusterIP}'):$(kubectl get service reviews -o jsonpath='{.spec.ports[0].port}')/reviews/2 | jq -->
 
 Then modify the command to run from one of the other pods. E.g., pull the
 details while on the `reviews` pod.
 
-[//]: # (kubectl exec reviews -- curl -sS http://details:$(kubectl get service details -o jsonpath='{.spec.ports[0].port}')/details/2 | jq)
+<!-- kubectl exec reviews -- curl -sS http://details:$(kubectl get service details -o jsonpath='{.spec.ports[0].port}')/details/2 | jq -->
 
 ## Clean up
 
