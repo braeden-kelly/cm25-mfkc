@@ -122,9 +122,9 @@ if we want.
    to craft a `kubectl get` command to show only the `reviews` and `details`
    pods using the label selectors.
 
-[//]: # (run=reviews, run=details, run=productpage)
+<!-- run=reviews, run=details, run=productpage -->
 
-[//]: # (kubectl get pods -l 'run!=productpage')
+<!-- kubectl get pods -l 'run!=productpage' -->
 
 ## End of lesson
 
