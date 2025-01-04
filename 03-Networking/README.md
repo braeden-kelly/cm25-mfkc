@@ -67,7 +67,7 @@ spit out only the value we want.
 kubectl get services productpage -o json | jq -r '.spec.clusterIP'
 ```
 
-If we didn't want to involve another utiliy like `jq`, we could stay within
+If we didn't want to involve another utility like `jq`, we could stay within
 `kubectl` and use [JSONPath](https://goessner.net/articles/JsonPath/).
 
 ```shell
@@ -177,6 +177,19 @@ with that address and `33333` with the `NodePort` for `productpage`.
 curl -sS http://172.111.222.444:33333/productpage
 ```
 
+## Exercise
+
+Craft a statement to pull the reviews and details for book ID 2 (or whatever
+integer, it literally doesn't matter) by passing it as path info on the URL
+(i.e., add `/2` to the end of the URL). The response will be JSON.
+
+[//]: # (curl -sS http://$(kubectl get service reviews -o jsonpath='{.spec.clusterIP}'):$(kubectl get service reviews -o jsonpath='{.spec.ports[0].port}')/reviews/2 | jq)
+
+Then modify the command to run from one of the other pods. E.g., pull the
+details while on the `reviews` pod.
+
+[//]: # (kubectl exec reviews -- curl -sS http://details:$(kubectl get service details -o jsonpath='{.spec.ports[0].port}')/details/2 | jq)
+
 ## Clean up
 
 There are more ways to make our services available to outside of the cluster,
@@ -186,6 +199,8 @@ but we'll get to those in a later lesson. For now, let's clean up.
 kubectl delete service details productpage reviews
 kubectl delete pod details productpage reviews
 ```
+
+The `kubectl delete` command works just like most of the others. 
 
 ## End of lesson
 

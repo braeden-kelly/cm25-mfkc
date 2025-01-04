@@ -114,6 +114,18 @@ For now, these details aren't immediately important to us. Just be aware that we
 can get more details about a resource from `kubectl describe` or `kubectl get`
 if we want.
 
+## Exercise
+
+1. Find the labels that were automatically assigned to each of the three pods.
+2. Use the [Kubectl
+   Reference](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands)
+   to craft a `kubectl get` command to show only the `reviews` and `details`
+   pods using the label selectors.
+
+[//]: # (run=reviews, run=details, run=productpage)
+
+[//]: # (kubectl get pods -l 'run!=productpage')
+
 ## End of lesson
 
 We will get the **Bookinfo** application actually running in the next lesson,

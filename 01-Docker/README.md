@@ -19,9 +19,9 @@ the private (aka local) and public IP addresses.
 
 ```shell
 PRIVATE_IPV4=$(curl -sSH "X-aws-ec2-metadata-token: ${METADATA_TOKEN}" http://169.254.169.254/latest/meta-data/local-ipv4)
-echo ${PRIVATE_IPV4}
+echo PRIVATE_IPV4 = ${PRIVATE_IPV4}
 PUBLIC_IPV4=$(curl -sSH "X-aws-ec2-metadata-token: ${METADATA_TOKEN}" http://169.254.169.254/latest/meta-data/public-ipv4)
-echo ${PUBLIC_IPV4}
+echo PUBLIC_IPV4 = ${PUBLIC_IPV4}
 ```
 
 Now we can get back to the problem at hand.
