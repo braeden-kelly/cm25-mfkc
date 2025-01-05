@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-cert
+spec:
+  acme:
+    email: otherdevopsgene@portinfo.com # Replace with your email
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-cert-private-key
+    solvers:
+      - http01:
+          ingress:
+            class: traefik

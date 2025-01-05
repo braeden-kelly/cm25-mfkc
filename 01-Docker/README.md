@@ -66,7 +66,7 @@ If we mapped a domain name to the public IP address (which we did), we could use
 that instead. We can try with
 `http://username.codemash.otherdevopsgene.dev:8080/productpage`. Replace
 `username` with the username you used to login to AWS. If you get an error, your
-browser is probably protecting you by "fixing" the URL to use `https`. 
+browser is probably protecting you by *fixing* the URL to use `https`. 
 
 To fix that, we'd need to use `https` and that means setting up a certificate,
 preferably one that is signed by someone that our browser trusts. Too much work
