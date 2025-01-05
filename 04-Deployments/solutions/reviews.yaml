@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: reviews
+  name: reviews
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: reviews
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: reviews
+    spec:
+      containers:
+      - image: docker.io/istio/examples-bookinfo-reviews-v1:1.20.2
+        imagePullPolicy: Always
+        name: examples-bookinfo-reviews-v1
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 9080
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 9080
+      restartPolicy: Always
+      securityContext: {}

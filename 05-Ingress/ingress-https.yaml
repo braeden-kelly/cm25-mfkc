@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bookinfo-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-cert # name from cluster-issuer
+spec:
+  rules:
+  - host: lanemeyer.codemash.otherdevopsgene.dev # replace lanemeyer with your username
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: productpage
+            port:
+              number: 9080
+  tls:
+  - hosts:
+    - lanemeyer.codemash.otherdevopsgene.dev # replace lanemeyer with your username
+    secretName: acme-tls-cert
