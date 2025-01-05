@@ -21,7 +21,11 @@ accessible to the world outside.
 In turn, they have a significant overlap with an `Ingress`, which also can be
 used to make an application accisible from outside the cluster. And an ingress
 is often implemented within the cluster. For this reason, ingresses are a
-popular alternativeto load balancers in the Kubernetes world.
+popular alternative to load balancers in the Kubernetes world.
+
+In our particular case, `k3s` provides a `LoadBalancer` implementation within
+the cluster as well as an `Ingress`, but the `Ingress` will be more interesting
+to see.
 
 ## Ingress
 
@@ -262,31 +266,54 @@ kubectl apply -f ingress.yaml
 kubectl describe ingress bookinfo-ingress
 ```
 
-TLS and CreateCertificate
+We can see that the certificate was successfully created in the `Events`
+section.
+
+Notice that the `TLS` section says that `acme-tls-cert` (our certificate)
+terminates our FQDN. That means that once the TLS-encrypted traffic arrives at
+our ingress, the ingress will pass unencrypted, plain HTTP traffic on to the
+service in our cluster. So our service (or services) don't need to handle TLS
+traffic, but external users still get the protections of TLS.
+
+There are other options for protecting the internal traffic and ways for Traefik
+to not terminate if your use case calls for those.
+
+Let's take a quick look at the certificate.
 
 ```shell
 kubectl get secrets
 kubectl describe secrets acme-tls-cert
-kubectl get ingress
-kubectl describe ingress cm-acme-http-solver-bfm2g
 ```
 
-Understated value of Kubernetes. Installed cert-manager, pointed it to Let's
-Encrypt. Redeployed our ingress to include a hostname and the cluster-issuer ==
-cert-manager configuration we wanted to use.
+This time, our secret shows two entries- a public key (`tls.crt`) and a private
+key (`tls.key`). We could decode these if we wanted, but the important part here
+is that the certificate manager automatically requested and installed them.
 
-We proved that we were entitled to use the domain name
-(cm-acme-http-solver-bfm2g), generated a certificate request, requested a cert
-with the CA, received and installed the certificate, set up the Ingress for TLS
-termination. All that's left is to make `http` redirect to `https`.
+This is an understated value of using a well-defined framework like Kubernetes.
+We installed cert-manager and pointed it to Let's Encrypt as the certificate
+authority (CA). We redeployed our ingress to include a hostname and the
+configuration (`cluster-issuer`) we wanted to use. We generated a certificate
+request, requested a cert with the CA, received and installed the certificate,
+set up the ingress for TLS termination. That's a lot for not much work on our
+part.
 
-`curl --head http://lanemeyer.codemash.otherdevopsgene.dev/productpage`
+## HTTP redirection
 
-Notice the `200 OK`
+All that's left to make this configuration really useable is to make `http`
+redirect to `https`.
 
-This step happens to be Traefik-specific.
+On your laptop, check the current behavior.
 
-`middleware.yaml`
+```shell
+curl --head -sS http://lanemeyer.codemash.otherdevopsgene.dev/productpage
+```
+
+Notice the `200 OK`.
+
+Now we can configure our ingress. This step happens to be Traefik-specific, as
+we'll see from the `apiVersion`.
+
+Create and apply `middleware.yaml`:
 
 ```yaml
 apiVersion: traefik.containo.us/v1alpha1
@@ -300,29 +327,44 @@ spec:
     permanent: true
 ```
 
-In `ingress.yaml` add an annotation:
+```shell
+kubectl apply -f middleware.yaml
+```
+
+The naming format for Traefik to reference the middleware we created is
+`namespace-middlewarename@kubernetescrd`. Add an annotation to our ingress
+configuration:
 
 ```yaml
     traefik.ingress.kubernetes.io/router.middlewares: default-redirect@kubernetescrd
 ```
 
-`namespace`-`middlewarename`@kubernetescrd
+And apply.
 
 ```shell
-kubectl apply -f middleware.yaml
 kubectl apply -f ingress.yaml
 ```
 
-`curl --head http://lanemeyer.codemash.otherdevopsgene.dev/productpage`
+And let's test from our laptops again.
+
+```shell
+curl --head -sS http://lanemeyer.codemash.otherdevopsgene.dev/productpage
+```
 
 Notice the `308 Permanent Redirect`
 
-`curl --head https://lanemeyer.codemash.otherdevopsgene.dev/productpage`
-
-
-Let's see what it logged using the `kubectl logs` command. Replace
-`traefik-57b79cf995-dgc77` with the name of the `traefik` pod on your cluster.
-
 ```shell
-kubectl logs -n kube-system traefik-57b79cf995-dgc77
+curl --head -sS https://lanemeyer.codemash.otherdevopsgene.dev/productpage
 ```
+
+Works as expected. We can confirm the behavior with our web browsers, too.
+
+## Exercise
+
+Modify the `bookinfo-ingress` to allow access to the `details` and `reviews`
+services from outside the cluster using `https`.
+
+## End of lesson
+
+Now, back to deployments soon in
+[06-Rollouts](../06-Rollouts/README.md).
