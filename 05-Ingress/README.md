@@ -149,10 +149,10 @@ namespace that we've been creating, and some parts of the system that `k3s`
 brought in to start in the `kube-system` namespace, including the `traefik`
 ingress controller we worked with above.
 
+Now we need a certificate. And we'll see some new resource types on the way.
 
-Let's Encrypt aka ACME
-
-`cluster-issuer.yaml`
+Create and apply `cluster-issuer.yaml`, making sure to replace the email address
+appropriately.
 
 ```yaml
 apiVersion: cert-manager.io/v1
@@ -171,27 +171,65 @@ spec:
             class: traefik
 ```
 
+Notice from the `apiVersion` that this is not a standard Kubernetes resource.
+This is a custom resource that `cert-manager` defined, specifically
+`customresourcedefinition.apiextensions.k8s.io/clusterissuers.cert-manager.io`.
+Custom resource definitions, or CRDs, are a way to extend the Kubernetes API. We
+won't get into writing a CRD, but obviously we are starting to use them.
+
 ```shell
 kubectl apply -f cluster-issuer.yaml
+kubectl get clusterissuer
+kubectl describe clusterissuer
+```
+
+The `ClusterIssuer` doesn't live in a namespace because it is cluster-wide.
+There is a version called an `Issuer` that can be namespace-specific.
+
+Aside from the information we supplied, we can see some status that says we
+registered with the ACME server, which is the certificate authority called
+[Let's Encrypt](https://letsencrypt.org/).
+
+## Secrets
+
+Some other resouces got created as well. Let's look into one in particular.
+
+```shell
 kubectl get secrets -n cert-manager
 kubectl describe secret -n cert-manager letsencrypt-cert-private-key
 ```
 
-Not actually secret
+It is called a secret and has one piece of data (therefore, technically a datum)
+called `tls.key`. If you know anything about how certificates work, you might
+recognize that as the private key that keeps a certificate secure.
+Unfortunately, despite the name, a Kubernetes `secret` is not actually secret,
+at least not by default. It is just a collection of Base64-encoded name-value
+pairs.
+
+Try either (or both) of:
 
 ```shell
 kubectl get secret -n cert-manager letsencrypt-cert-private-key --template="{{index .data \"tls.key\"}}" | base64 -d
 kubectl get secret -n cert-manager letsencrypt-cert-private-key -o json | jq '.data | map_values(@base64d)'
 ```
 
-JSON, YAML, [Go Templates](https://pkg.go.dev/text/template), JSON Path
+The complexity around the Go template is because the single name-value pair
+`tls.key` has a dot in the name, so `--template={{.data.tls.key}}` would look
+like an attribute named `key` further in the hierarchy. 
 
-Could have used `--template={{.data.tls.key}}` except `tls.key` has a dot.
+But the point is that this secret is just encoded, not encrypted, so is obscured
+from casual viewing, but not secret at all. There are ways to change that, but
+we won't have time to explore further. Just remember, without some changes, a
+`secret` isn't secret.
 
-`ConfigSet` is the same thing, without pretending to be secret. Just name-value
-pair store.
+A `ConfigSet` is almost the same thing, without pretending to be secret. Just a
+name-value pair store. We'll play with that resource later.
 
-Update `ingress.yaml`
+## TLS traffic
+
+Update and apply `ingress.yaml` to know about our `cert-manager` and more
+importantly our `ClusterIssuer` which will handle getting certificates from
+Let's Encrypt for us. The ingress also needs to know what name to 
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -215,6 +253,7 @@ spec:
   tls:
   - hosts:
     - lanemeyer.codemash.otherdevopsgene.dev # replace lanemeyer with your username
+    - 111.222.333.444 # replace with your public IP
     secretName: acme-tls-cert
 ```
 
