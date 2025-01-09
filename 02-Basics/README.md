@@ -37,7 +37,7 @@ kubectl get nodes
 ```
 
 A node is just where Kubernetes is running. Nodes can be part of the control
-plane, a worker node that hosts containers, or both. 
+plane, a worker node that hosts containers, or both.
 
 Still not much to see, but this does introduce one of the most common commands
 we'll use, `kubectl get` *resource_type*. That provides us a list of all the
@@ -56,10 +56,10 @@ blocks for Kubernetes.
 kubectl get pods
 ```
 
-Currently, we have not started any pods. 
+Currently, we have not started any pods.
 
 We can run the same **Bookinfo** microservices application as before, but this
-time using Kubernetes. 
+time using Kubernetes.
 
 <img src="../bookinfo-basic.svg">
 
@@ -95,7 +95,7 @@ each pod. Notice that the cluster has assigned an internal IP address to each of
 the pods.
 
 We can also see that the pods have all be *scheduled* on the same node, not that
-there were any alternatives at this point. 
+there were any alternatives at this point.
 
 If we wanted to really deep-dive into a pod, we can use the `kubectl describe`
 *resource_type* *resource_name* command.

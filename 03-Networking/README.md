@@ -16,7 +16,7 @@ kubectl expose pod productpage --port 9080 --target-port 9080
 The `--port` option tells the cluster what port number we will be using, and the
 `--target-port` specifies the port on the container it will be mapped to. Since
 Kubernetes has assigned a separate IP address for each pod, we can use the same
-port number for each of the services. 
+port number for each of the services.
 
 Also, we are explicitly opening `productpage` on a port that is **not** open to
 the Internet. More on that later.
@@ -44,7 +44,7 @@ running. And although we didn't specify, they all have a type of `ClusterIP`.
 `ClusterIP` is the default networking option and means that the networking is
 handled entirely within the cluster. The IP address it uses is non-routable- it
 cannot be accessed from outside the cluster. You would have to be on the node or
-within a pod to access it. 
+within a pod to access it.
 
 Let's test it out. We'll need the `ClusterIP` for the `productpage` service so
 we can put together a URL.
@@ -126,7 +126,7 @@ If you don't see a command prompt, try pressing enter.
 pod "curl" deleted
 ```
 
-or 
+or
 
 ```console
 $ kubectl run -it --rm --restart=Never busybox --image=gcr.io/google-containers/busybox nslookup productpage
@@ -168,10 +168,10 @@ curl -sS http://${PRIVATE_IPV4}:33333/productpage
 If the high ports for `NodePort` were open between systems, you could use your
 neighbor's private IP address to access their copy of the app. In our case,
 those port **are** open, specifically for this experiment. Normally, there woud
-be no good reason to keep them open, and very good reasons not to. 
+be no good reason to keep them open, and very good reasons not to.
 
 Ask your neighbor for their private IP address, and replace `172.111.222.444`
-with that address and `33333` with the `NodePort` for `productpage`. 
+with that address and `33333` with the `NodePort` for `productpage`.
 
 ```shell
 curl -sS http://172.111.222.444:33333/productpage
@@ -200,7 +200,7 @@ kubectl delete service details productpage reviews
 kubectl delete pod details productpage reviews
 ```
 
-The `kubectl delete` command works just like most of the others. 
+The `kubectl delete` command works just like most of the others.
 
 ## End of lesson
 

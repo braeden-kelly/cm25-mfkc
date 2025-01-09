@@ -9,7 +9,7 @@ orchestration capabilities, we need to use something more powerful.
 Deployments wrap pods with the ability to monitor and restart pods,
 scale up or down, and to roll out and roll back updates.
 
-Creating deployments is almost the same as running the pods- instead of 
+Creating deployments is almost the same as running the pods- instead of
 `kubectl run` use `kubectl create deployment`.
 
 ```shell
@@ -91,7 +91,7 @@ we'll check out some of the other capabilities of deployemnts later.
 For now, let's look at a better way to define and manage our resources.
 
 ```shell
-kubectl edit deployment productpage 
+kubectl edit deployment productpage
 ```
 
 This is a Kubernetes manifest. At first glance, we might notice that this looks
