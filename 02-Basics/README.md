@@ -13,7 +13,10 @@ that handle all the Kubernetes-ness, from
 [minikube](https://minikube.sigs.k8s.io/docs/) or
 [kind](https://kind.sigs.k8s.io/) to [Amazon Elastic Kubernetes
 Service](https://aws.amazon.com/eks/). Almost everything we do here will work
-with any control plane since we are working through the Kubernetes API. 
+with any control plane since we are working through the Kubernetes API.
+
+`k3s` was already installed for you, but if you need it in a different
+environment, all it takes is `curl -sfL https://get.k3s.io | sh -`
 
 We can tell that our cluster running by accessing the Kubernetes API through our
 soon-to-be favorite tool, `kubectl`.
