@@ -1,4 +1,4 @@
-# Working with Ingress
+# Working with Ingresses
 
 When we looked at networking before, we focused on networking within the cluster
 opening a view into an application that might be suited for development or

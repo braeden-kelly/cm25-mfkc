@@ -1,4 +1,4 @@
-# Networking
+# Kubernetes networking
 
 To get our services talking to each other, we need to expose the them to the
 other services.
@@ -147,7 +147,7 @@ $ curl http://productpage.default.svc.cluster.local:9080/productpage
 curl: (6) Could not resolve host: productpage.default.svc.cluster.local
 ```
 
-# NodePort
+## NodePort
 
 The next networking choice for Kubernetes is `NodePort`. A service exposed using
 `NodePort` gets a high port (30000 to 32768) from the cluster and uses the IP

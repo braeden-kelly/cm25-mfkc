@@ -1,4 +1,4 @@
-# Basics
+# Kubernetes basics
 
 Now, let's stand up the same application using Kubernetes.
 
