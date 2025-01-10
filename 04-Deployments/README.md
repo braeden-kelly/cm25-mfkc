@@ -172,6 +172,7 @@ spec:
     spec:
       containers:
       - image: docker.io/istio/examples-bookinfo-reviews-v1:1.20.2
+        name: examples-bookinfo-reviews-v1
 ```
 
 Now let's apply it again.

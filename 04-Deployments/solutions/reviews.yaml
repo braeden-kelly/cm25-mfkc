@@ -10,11 +10,6 @@ spec:
   selector:
     matchLabels:
       app: reviews
-  strategy:
-    rollingUpdate:
-      maxSurge: 25%
-      maxUnavailable: 25%
-    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -22,8 +17,8 @@ spec:
     spec:
       containers:
       - image: docker.io/istio/examples-bookinfo-reviews-v1:1.20.2
-        imagePullPolicy: Always
         name: examples-bookinfo-reviews-v1
+        imagePullPolicy: Always
         livenessProbe:
           httpGet:
             path: /health
@@ -32,5 +27,3 @@ spec:
           httpGet:
             path: /health
             port: 9080
-      restartPolicy: Always
-      securityContext: {}
