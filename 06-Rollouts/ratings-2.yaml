@@ -2,19 +2,19 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: reviews
-  name: reviews
+    app: ratings
+  name: ratings
   namespace: default
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: reviews
+      app: ratings
   template:
     metadata:
       labels:
-        app: reviews
+        app: ratings
     spec:
       containers:
-      - image: docker.io/istio/examples-bookinfo-reviews-v1:1.20.2
-        name: examples-bookinfo-reviews-v1
+      - image: docker.io/istio/examples-bookinfo-ratings-v1:1.20.2
+        name: examples-bookinfo-ratings-v1

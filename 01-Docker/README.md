@@ -15,7 +15,7 @@ curl -sSH "X-aws-ec2-metadata-token: ${METADATA_TOKEN}" http://169.254.169.254/l
 ```
 
 That `curl` request will show us list of the information we can ask for. We need
-the private (aka local) and public IP addresses. 
+the private (aka local) and public IP addresses.
 
 ```shell
 PRIVATE_IPV4=$(curl -sSH "X-aws-ec2-metadata-token: ${METADATA_TOKEN}" http://169.254.169.254/latest/meta-data/local-ipv4)
@@ -29,7 +29,7 @@ Now we can get back to the problem at hand.
 ## Bookinfo
 
 For example, let's consider the fairly simple application shown below, known as
-**Bookinfo**. 
+**Bookinfo**.
 
 <img src="../bookinfo-basic.svg">
 
@@ -38,7 +38,7 @@ Requests come into `productpage`. That service makes requests to `reviews` and
 
 The authors of `productpage` allowed for us to configure the networking via
 environment variables. Kubernetes calls this *service discovery*, which we are
-doing manually. 
+doing manually.
 
 ```shell
 docker run --rm -d -p 9081:9080 docker.io/istio/examples-bookinfo-reviews-v1:1.20.2
@@ -66,7 +66,7 @@ If we mapped a domain name to the public IP address (which we did), we could use
 that instead. We can try with
 `http://username.codemash.otherdevopsgene.dev:8080/productpage`. Replace
 `username` with the username you used to login to AWS. If you get an error, your
-browser is probably protecting you by *fixing* the URL to use `https`. 
+browser is probably protecting you by *fixing* the URL to use `https`.
 
 To fix that, we'd need to use `https` and that means setting up a certificate,
 preferably one that is signed by someone that our browser trusts. Too much work

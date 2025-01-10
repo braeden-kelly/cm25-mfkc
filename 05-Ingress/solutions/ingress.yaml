@@ -17,6 +17,20 @@ spec:
             name: productpage
             port:
               number: 9080
+      - path: /reviews
+        pathType: Prefix
+        backend:
+          service:
+            name: reviews
+            port:
+              number: 9080
+      - path: /details
+        pathType: Prefix
+        backend:
+          service:
+            name: details
+            port:
+              number: 9080
   tls:
   - hosts:
     - william.codemash.otherdevopsgene.dev # replace william with your username

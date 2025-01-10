@@ -1,4 +1,4 @@
-# Basics
+# Kubernetes basics
 
 Now, let's stand up the same application using Kubernetes.
 
@@ -13,7 +13,10 @@ that handle all the Kubernetes-ness, from
 [minikube](https://minikube.sigs.k8s.io/docs/) or
 [kind](https://kind.sigs.k8s.io/) to [Amazon Elastic Kubernetes
 Service](https://aws.amazon.com/eks/). Almost everything we do here will work
-with any control plane since we are working through the Kubernetes API. 
+with any control plane since we are working through the Kubernetes API.
+
+`k3s` was already installed for you, but if you need it in a different
+environment, all it takes is `curl -sfL https://get.k3s.io | sh -`
 
 We can tell that our cluster running by accessing the Kubernetes API through our
 soon-to-be favorite tool, `kubectl`.
@@ -34,7 +37,7 @@ kubectl get nodes
 ```
 
 A node is just where Kubernetes is running. Nodes can be part of the control
-plane, a worker node that hosts containers, or both. 
+plane, a worker node that hosts containers, or both.
 
 Still not much to see, but this does introduce one of the most common commands
 we'll use, `kubectl get` *resource_type*. That provides us a list of all the
@@ -53,10 +56,10 @@ blocks for Kubernetes.
 kubectl get pods
 ```
 
-Currently, we have not started any pods. 
+Currently, we have not started any pods.
 
 We can run the same **Bookinfo** microservices application as before, but this
-time using Kubernetes. 
+time using Kubernetes.
 
 <img src="../bookinfo-basic.svg">
 
@@ -92,7 +95,7 @@ each pod. Notice that the cluster has assigned an internal IP address to each of
 the pods.
 
 We can also see that the pods have all be *scheduled* on the same node, not that
-there were any alternatives at this point. 
+there were any alternatives at this point.
 
 If we wanted to really deep-dive into a pod, we can use the `kubectl describe`
 *resource_type* *resource_name* command.

@@ -6,7 +6,7 @@ metadata:
   name: reviews
   namespace: default
 spec:
-  replicas: 2
+  replicas: 4
   selector:
     matchLabels:
       app: reviews
@@ -18,3 +18,12 @@ spec:
       containers:
       - image: docker.io/istio/examples-bookinfo-reviews-v1:1.20.2
         name: examples-bookinfo-reviews-v1
+        imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 9080
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 9080

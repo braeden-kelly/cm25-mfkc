@@ -1,4 +1,4 @@
-# Deployments
+# Using Deployments
 
 Pods may be a basic building block for Kubernetes, but they don't add much
 beyond Docker containers. If we want to take advantage of Kuberenetes
@@ -9,7 +9,7 @@ orchestration capabilities, we need to use something more powerful.
 Deployments wrap pods with the ability to monitor and restart pods,
 scale up or down, and to roll out and roll back updates.
 
-Creating deployments is almost the same as running the pods- instead of 
+Creating deployments is almost the same as running the pods- instead of
 `kubectl run` use `kubectl create deployment`.
 
 ```shell
@@ -63,7 +63,7 @@ curl -sS http://10.777.888.999:9080/productpage
 ```
 
 We didn't recreate the service- it stayed intact. And everything still works
-networking-wise. 
+networking-wise.
 
 We can delete pods and let them be recreated, and we'll see that the last random
 string changes each time, but the middle random string remains consistent.
@@ -91,7 +91,7 @@ we'll check out some of the other capabilities of deployemnts later.
 For now, let's look at a better way to define and manage our resources.
 
 ```shell
-kubectl edit deployment productpage 
+kubectl edit deployment productpage
 ```
 
 This is a Kubernetes manifest. At first glance, we might notice that this looks
@@ -110,7 +110,7 @@ the contents that will be replicated as needed.
 
 For now, find the `replicas` field under the outermost `spec`. Change the value
 from `1` to `2` (<kbd>s2</kdb><kbd>ESC</kbd>) and then save the file
-(<kbd>:wq</kbd><kbd>ENTER</kbd>). 
+(<kbd>:wq</kbd><kbd>ENTER</kbd>).
 
 ```shell
 kubectl get deployments,replicasets,pods
@@ -132,7 +132,7 @@ Double-click on `reviews.yaml` in the left-hand tool bar. Now you can use the
 visual editor to change to 2 replicas and save. (An &#x2715; in the tab will
 replace the white &#x20DD; when the editor is saved.)
 
-```shell 
+```shell
 kubectl apply -f reviews.yaml
 kubectl get deployment reviews
 ```
@@ -142,7 +142,7 @@ automatically. And we can see that the `reviews` deployment was configured.
 
 Before anything else changes, let's apply the file again.
 
-```shell 
+```shell
 kubectl apply -f reviews.yaml
 ```
 
@@ -165,11 +165,6 @@ spec:
   selector:
     matchLabels:
       app: reviews
-  strategy:
-    rollingUpdate:
-      maxSurge: 25%
-      maxUnavailable: 25%
-    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -177,10 +172,7 @@ spec:
     spec:
       containers:
       - image: docker.io/istio/examples-bookinfo-reviews-v1:1.20.2
-        imagePullPolicy: IfNotPresent
         name: examples-bookinfo-reviews-v1
-      restartPolicy: Always
-      securityContext: {}
 ```
 
 Now let's apply it again.
@@ -222,6 +214,9 @@ using the right format, but also if we are following recommended practices.
 infrastructure-as-code (IaC), including Kubernetes manifests. It has a lot of
 suggestions, most well beyond our current understanding of Kubernetes resources.
 
+To save time, it is already installed for you. But installing Checkov is just
+`pip install checkov` or `pip install -U checkov` to upgrade.
+
 ```shell
 checkov -f reviews.yaml
 ```
@@ -237,7 +232,7 @@ make an informed decision.
 ## Writing manifests
 
 Aside from capturing the YAML from existing resources and searching on the web,
-Kubernetes does give us some guidance as to the attributes and their meanings. 
+Kubernetes does give us some guidance as to the attributes and their meanings.
 
 ```shell
 kubectl explain deployments

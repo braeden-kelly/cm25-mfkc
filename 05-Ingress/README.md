@@ -1,10 +1,10 @@
-# Ingress
+# Working with Ingresses
 
 When we looked at networking before, we focused on networking within the cluster
 opening a view into an application that might be suited for development or
 debugging, since you need to know which node the application was running on.
 
-Now, we are going to look at something that might be appropriate for production. 
+Now, we are going to look at something that might be appropriate for production.
 
 ## Load balancers
 
@@ -16,7 +16,7 @@ students.
 
 They work operate very much like traditional load balancers, and in
 Kubernetes they also can be used to make an application within the cluster
-accessible to the world outside. 
+accessible to the world outside.
 
 In turn, they have a significant overlap with an `Ingress`, which also can be
 used to make an application accisible from outside the cluster. And an ingress
@@ -59,7 +59,7 @@ kubectl describe ingress bookinfo-ingress
 
 Note that the class is listed as `traefik`, which is an ingress controller that
 is distributed with `k3s`. The ingress is assigned the IP address of the system
-we are using, albeit listed as the private IP. 
+we are using, albeit listed as the private IP.
 
 As configured, all traffic (path prefix '/') is sent to port 9080 on the
 `productpage` service. We can try it.
@@ -91,9 +91,9 @@ Then on the laptop, use `http://111.222.333.444/productpage`, replacing
 
 Back in the first lesson, we discussed that could use a domain name if we mapped
 it to the public IP address (which we did). Try
-`http://lanemeyer.codemash.otherdevopsgene.dev/productpage`. Replace
-`lanemeyer` with the username you used to login to AWS. If you get an error, your
-browser is probably protecting you by *fixing* the URL to use `https`. 
+`http://william.codemash.otherdevopsgene.dev/productpage`. Replace
+`william` with the username you used to login to AWS. If you get an error, your
+browser is probably protecting you by *fixing* the URL to use `https`.
 
 Turns out, we can make that work, too.
 
@@ -124,7 +124,7 @@ Probably not what we expected. The `kubectl apply` said it created
 aren't there. So where did they go?
 
 Well, the first line of the `kubectl apply` said it created
-`namespace/cert-manager`, so let's try `namespaces`. 
+`namespace/cert-manager`, so let's try `namespaces`.
 
 ```shell
 kubectl get namespaces
@@ -219,7 +219,7 @@ kubectl get secret -n cert-manager letsencrypt-cert-private-key -o json | jq '.d
 
 The complexity around the Go template is because the single name-value pair
 `tls.key` has a dot in the name, so `--template={{.data.tls.key}}` would look
-like an attribute named `key` further in the hierarchy. 
+like an attribute named `key` further in the hierarchy.
 
 But the point is that this secret is just encoded, not encrypted, so is obscured
 from casual viewing, but not secret at all. There are ways to change that, but
@@ -233,7 +233,7 @@ name-value pair store. We'll play with that resource later.
 
 Update and apply `ingress.yaml` to know about our `cert-manager` and more
 importantly our `ClusterIssuer` which will handle getting certificates from
-Let's Encrypt for us. The ingress also needs to know what name to 
+Let's Encrypt for us. The ingress also needs to know what name to
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -244,7 +244,7 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-cert # name from cluster-issuer
 spec:
   rules:
-  - host: lanemeyer.codemash.otherdevopsgene.dev # replace lanemeyer with your username
+  - host: william.codemash.otherdevopsgene.dev # replace william with your username
     http:
       paths:
       - path: /
@@ -256,7 +256,7 @@ spec:
               number: 9080
   tls:
   - hosts:
-    - lanemeyer.codemash.otherdevopsgene.dev # replace lanemeyer with your username
+    - william.codemash.otherdevopsgene.dev # replace william with your username
     - 111.222.333.444 # replace with your public IP
     secretName: acme-tls-cert
 ```
@@ -305,7 +305,7 @@ redirect to `https`.
 On your laptop, check the current behavior.
 
 ```shell
-curl --head -sS http://lanemeyer.codemash.otherdevopsgene.dev/productpage
+curl --head -sS http://william.codemash.otherdevopsgene.dev/productpage
 ```
 
 Notice the `200 OK`.
@@ -348,13 +348,13 @@ kubectl apply -f ingress.yaml
 And let's test from our laptops again.
 
 ```shell
-curl --head -sS http://lanemeyer.codemash.otherdevopsgene.dev/productpage
+curl --head -sS http://william.codemash.otherdevopsgene.dev/productpage
 ```
 
 Notice the `308 Permanent Redirect`
 
 ```shell
-curl --head -sS https://lanemeyer.codemash.otherdevopsgene.dev/productpage
+curl --head -sS https://william.codemash.otherdevopsgene.dev/productpage
 ```
 
 Works as expected. We can confirm the behavior with our web browsers, too.
