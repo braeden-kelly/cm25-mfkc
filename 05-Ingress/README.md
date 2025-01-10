@@ -91,8 +91,8 @@ Then on the laptop, use `http://111.222.333.444/productpage`, replacing
 
 Back in the first lesson, we discussed that could use a domain name if we mapped
 it to the public IP address (which we did). Try
-`http://lanemeyer.codemash.otherdevopsgene.dev/productpage`. Replace
-`lanemeyer` with the username you used to login to AWS. If you get an error, your
+`http://william.codemash.otherdevopsgene.dev/productpage`. Replace
+`william` with the username you used to login to AWS. If you get an error, your
 browser is probably protecting you by *fixing* the URL to use `https`.
 
 Turns out, we can make that work, too.
@@ -244,7 +244,7 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-cert # name from cluster-issuer
 spec:
   rules:
-  - host: lanemeyer.codemash.otherdevopsgene.dev # replace lanemeyer with your username
+  - host: william.codemash.otherdevopsgene.dev # replace william with your username
     http:
       paths:
       - path: /
@@ -256,7 +256,7 @@ spec:
               number: 9080
   tls:
   - hosts:
-    - lanemeyer.codemash.otherdevopsgene.dev # replace lanemeyer with your username
+    - william.codemash.otherdevopsgene.dev # replace william with your username
     - 111.222.333.444 # replace with your public IP
     secretName: acme-tls-cert
 ```
@@ -305,7 +305,7 @@ redirect to `https`.
 On your laptop, check the current behavior.
 
 ```shell
-curl --head -sS http://lanemeyer.codemash.otherdevopsgene.dev/productpage
+curl --head -sS http://william.codemash.otherdevopsgene.dev/productpage
 ```
 
 Notice the `200 OK`.
@@ -348,13 +348,13 @@ kubectl apply -f ingress.yaml
 And let's test from our laptops again.
 
 ```shell
-curl --head -sS http://lanemeyer.codemash.otherdevopsgene.dev/productpage
+curl --head -sS http://william.codemash.otherdevopsgene.dev/productpage
 ```
 
 Notice the `308 Permanent Redirect`
 
 ```shell
-curl --head -sS https://lanemeyer.codemash.otherdevopsgene.dev/productpage
+curl --head -sS https://william.codemash.otherdevopsgene.dev/productpage
 ```
 
 Works as expected. We can confirm the behavior with our web browsers, too.
