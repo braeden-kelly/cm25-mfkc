@@ -1,0 +1,34 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect
+  namespace: istio-system
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kiali-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-cert
+    traefik.ingress.kubernetes.io/router.middlewares: istio-system-redirect@kubernetescrd
+spec:
+  rules:
+  - host: william.codemash.otherdevopsgene.dev # replace william with your username
+    http:
+      paths:
+      - path: /kiali
+        pathType: Prefix
+        backend:
+          service:
+            name: kiali
+            port:
+              number: 20001
+  tls:
+  - hosts:
+    - william.codemash.otherdevopsgene.dev # replace william with your username
+    secretName: acme-tls-cert
