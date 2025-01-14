@@ -94,7 +94,9 @@ it to the public IP address (which we did). Try
 `http://william.codemash.otherdevopsgene.dev/productpage`. Replace `william`
 with the username you used to login to AWS and use `.work` or `.xyz` as the
 top-level domain if you didn't use `.dev`. If you get an error, your browser is
-probably protecting you by *fixing* the URL to use `https`.
+probably protecting you by *fixing* the URL to use `https`. If you get a warning
+that your connection is no private, your browser is *definitely* protecting you
+by using `https`.
 
 Turns out, we can make that work, too.
 
@@ -228,13 +230,14 @@ we won't have time to explore further. Just remember, without some changes, a
 `secret` isn't secret.
 
 A `ConfigSet` is almost the same thing, without pretending to be secret. Just a
-name-value pair store. We'll play with that resource later.
+name-value pair store.
 
 ## TLS traffic
 
 Update and apply `ingress.yaml` to know about our `cert-manager` and more
 importantly our `ClusterIssuer` which will handle getting certificates from
-Let's Encrypt for us. The ingress also needs to know what name to
+Let's Encrypt for us. The ingress also needs to know what fully-qualified domain
+name (FQDN) to use.
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -261,6 +264,13 @@ spec:
     - william.codemash.otherdevopsgene.dev # match the host above
     secretName: acme-tls-cert
 ```
+
+To get around some Let's Encrypt rate limitations, we might have to spread our
+certificate requests around several domains:
+
+- `otherdevopsgene.dev`
+- `otherdevopsgene.work`
+- `otherdevopsgene.xyz`
 
 ```shell
 kubectl apply -f ingress.yaml
@@ -291,7 +301,7 @@ key (`tls.key`). We could decode these if we wanted, but the important part here
 is that the certificate manager automatically requested and installed them.
 
 This is an understated value of using a well-defined framework like Kubernetes.
-We installed cert-manager and pointed it to Let's Encrypt as the certificate
+We installed `cert-manager` and pointed it to Let's Encrypt as the certificate
 authority (CA). We redeployed our ingress to include a hostname and the
 configuration (`cluster-issuer`) we wanted to use. We generated a certificate
 request, requested a cert with the CA, received and installed the certificate,
@@ -367,5 +377,5 @@ services from outside the cluster using `https`.
 
 ## End of lesson
 
-Now, back to deployments soon in
+Now, back to deployments in
 [06-Rollouts](../06-Rollouts/README.md).
