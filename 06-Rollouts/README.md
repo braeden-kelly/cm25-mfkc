@@ -215,5 +215,5 @@ This one gets stuck part way. Use <kbd>Ctrl</kbd>-<kbd>C</kbd> to exit the
 
 ## End of lesson
 
-We will see a visual representation of what we did in the next lesson,
+We will work on installing some new tools in the next lesson,
 [07-Helm](../07-Helm/README.md).
