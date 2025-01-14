@@ -91,9 +91,10 @@ Then on the laptop, use `http://111.222.333.444/productpage`, replacing
 
 Back in the first lesson, we discussed that could use a domain name if we mapped
 it to the public IP address (which we did). Try
-`http://william.codemash.otherdevopsgene.dev/productpage`. Replace
-`william` with the username you used to login to AWS. If you get an error, your
-browser is probably protecting you by *fixing* the URL to use `https`.
+`http://william.codemash.otherdevopsgene.dev/productpage`. Replace `william`
+with the username you used to login to AWS and use `.work` or `.xyz` as the
+top-level domain if you didn't use `.dev`. If you get an error, your browser is
+probably protecting you by *fixing* the URL to use `https`.
 
 Turns out, we can make that work, too.
 
@@ -245,6 +246,7 @@ metadata:
 spec:
   rules:
   - host: william.codemash.otherdevopsgene.dev # replace william with your username
+    # or william.codemash.otherdevopsgene.work or william.codemash.otherdevopsgene.xyz
     http:
       paths:
       - path: /
@@ -256,8 +258,7 @@ spec:
               number: 9080
   tls:
   - hosts:
-    - william.codemash.otherdevopsgene.dev # replace william with your username
-    - 111.222.333.444 # replace with your public IP
+    - william.codemash.otherdevopsgene.dev # match the host above
     secretName: acme-tls-cert
 ```
 

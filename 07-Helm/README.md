@@ -143,6 +143,7 @@ metadata:
 spec:
   rules:
   - host: william.codemash.otherdevopsgene.dev # replace william with your username
+    # or william.codemash.otherdevopsgene.work or william.codemash.otherdevopsgene.xyz
     http:
       paths:
       - path: /kiali
@@ -154,7 +155,7 @@ spec:
               number: 20001
   tls:
   - hosts:
-    - william.codemash.otherdevopsgene.dev # replace william with your username
+    - william.codemash.otherdevopsgene.dev # match the host above
     secretName: acme-tls-cert
 ```
 
@@ -182,7 +183,8 @@ kubectl get ingress -A
 
 In any case, we can now reach Kiali from our laptop at
 `https://william.codemash.otherdevopsgene.dev/kiali`, replacing `william` with
-your username as we did earlier with our first ingress.
+your username as we did earlier with our first ingress and using `.work` or
+`.xyz` as the top-level domain if we didn't use `.dev`.
 
 ## Creating a token
 

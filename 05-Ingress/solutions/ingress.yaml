@@ -8,6 +8,7 @@ metadata:
 spec:
   rules:
   - host: william.codemash.otherdevopsgene.dev # replace william with your username
+    # or william.codemash.otherdevopsgene.work or william.codemash.otherdevopsgene.xyz
     http:
       paths:
       - path: /
@@ -33,5 +34,5 @@ spec:
               number: 9080
   tls:
   - hosts:
-    - william.codemash.otherdevopsgene.dev # replace william with your username
+    - william.codemash.otherdevopsgene.dev # match the host above
     secretName: acme-tls-cert
