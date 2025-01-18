@@ -1,0 +1,3 @@
+- https://github.com/OtherDevOpsGene
+- https://discord.com/channels/1127340805741359164/1327997621725433866
+- https://landscape.cncf.io/
